@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { RPC_URL, MY_ADDRESS } from "./constants/index.js";
+import { RPC_URL, MY_ADDRESS } from "./constants.js";
 
 const provider = new ethers.JsonRpcProvider(RPC_URL);
 

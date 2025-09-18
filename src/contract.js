@@ -1,6 +1,6 @@
 // ethers.Contract 类是 ethers.js 提供的抽象层，用于与部署在以太坊区块链上的智能合约交互
 
-import { CONTRACT_ADDRESS, RPC_URL, MY_ADDRESS } from "./constants/index.js";
+import { CONTRACT_ADDRESS, RPC_URL, MY_ADDRESS } from "./constants.js";
 
 import { ethers } from "ethers";
 
