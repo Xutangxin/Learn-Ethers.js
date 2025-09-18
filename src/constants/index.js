@@ -4,5 +4,6 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export const RPC_URL = process.env.RPC_URL;
-
 export const MY_ADDRESS = process.env.MY_ADDRESS;
+export const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS;
+
