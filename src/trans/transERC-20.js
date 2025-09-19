@@ -6,6 +6,13 @@ import {
   RECIPIENT_ADDRESS,
 } from "../constants.js";
 
+// 本章介绍了如何使用 ethers.js 实现 ERC-20 代币（如 USDC）的转账流程。主要步骤包括：
+// 配置 RPC 节点和钱包，确保能够与区块链交互；
+// 获取 ERC-20 合约地址和 ABI，创建合约实例；
+// 获取代币的小数位数（decimals）和符号（symbol），并根据用户输入的金额进行单位转换；
+// 调用合约的 transfer 方法发起转账交易；
+// 等待交易上链并确认，获取交易回执信息。
+
 const provider = new JsonRpcProvider(RPC_URL);
 const wallet = new Wallet(MY_PRIVATE_KEY, provider);
 
