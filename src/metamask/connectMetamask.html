@@ -7,7 +7,7 @@
     <style>
       body {
         font-family: Arial, sans-serif;
-        max-width: 600px;
+        max-width: 500px;
         margin: 50px auto;
         padding: 20px;
         text-align: center;
@@ -60,11 +60,8 @@
   </head>
   <body>
     <h1>🦊 MetaMask 连接示例</h1>
-
     <div id="status" class="info">🔍 检测MetaMask安装状态...</div>
-
     <button id="connectButton" disabled>连接MetaMask</button>
-
     <div id="accountInfo" style="display: none">
       <h3>账户信息</h3>
       <p><strong>地址:</strong> <span id="accountAddress"></span></p>
@@ -72,16 +69,21 @@
     </div>
 
     <!-- 引入 ethers.js 库 -->
-    <script
+    <!-- <script
       src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"
       integrity="sha512-FDcVY+g7vc5CXANbrTSg1K5qLyriCsGDYCE02Li1tXEYdNQPvLPHNE+rT2Mjei8N7fZbe0WLhw27j2SrGRpdMg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script> -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.15.0/ethers.umd.min.js"
+      integrity="sha512-UXYETj+vXKSURF1UlgVRLzWRS9ZiQTv3lcL4rbeLyqTXCPNZC6PTLF/Ik3uxm2Zo+E109cUpJPZfLxJsCgKSng=="
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     ></script>
 
     <script>
       // 页面加载完成后执行
-
       document.addEventListener("DOMContentLoaded", function () {
         const connectButton = document.getElementById("connectButton");
         const statusDiv = document.getElementById("status");
@@ -114,9 +116,8 @@
             connectButton.disabled = true;
 
             // 创建provider并请求账户
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const provider = new ethers.BrowserProvider(window.ethereum);
             const accounts = await provider.send("eth_requestAccounts", []);
-            console.log('accounts: ', accounts);
 
             // 显示账户信息
             const account = accounts[0];
@@ -124,12 +125,11 @@
 
             // 获取余额
             const balance = await provider.getBalance(account);
-            const balanceInEth = ethers.utils.formatEther(balance);
+            const balanceInEth = ethers.formatEther(balance);
             accountBalanceSpan.textContent = balanceInEth;
 
             // 显示账户信息
             accountInfoDiv.style.display = "block";
-
             statusDiv.className = "success";
             statusDiv.innerHTML = `✅ 连接成功！已连接账户: ${account.substring(
               0,
@@ -141,14 +141,12 @@
             connectButton.disabled = true;
           } catch (error) {
             console.error("连接错误:", error);
-
             statusDiv.className = "error";
             if (error.code === 4001) {
               statusDiv.innerHTML = "❌ 用户拒绝了连接请求";
             } else {
               statusDiv.innerHTML = "❌ 连接失败: " + error.message;
             }
-
             connectButton.disabled = false;
           }
         }
