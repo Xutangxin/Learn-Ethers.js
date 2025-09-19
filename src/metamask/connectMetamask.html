@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>连接MetaMask示例</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 20px;
+        text-align: center;
+      }
+      button {
+        background-color: #f6851b;
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        font-size: 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        margin: 10px;
+      }
+      button:hover {
+        background-color: #e2761b;
+      }
+      button:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+      }
+      #status {
+        margin: 20px 0;
+        padding: 15px;
+        border-radius: 8px;
+      }
+      .success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+      .info {
+        background-color: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+      }
+      #accountInfo {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        text-align: left;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🦊 MetaMask 连接示例</h1>
+
+    <div id="status" class="info">🔍 检测MetaMask安装状态...</div>
+
+    <button id="connectButton" disabled>连接MetaMask</button>
+
+    <div id="accountInfo" style="display: none">
+      <h3>账户信息</h3>
+      <p><strong>地址:</strong> <span id="accountAddress"></span></p>
+      <p><strong>余额:</strong> <span id="accountBalance"></span> ETH</p>
+    </div>
+
+    <!-- 引入 ethers.js 库 -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"
+      integrity="sha512-FDcVY+g7vc5CXANbrTSg1K5qLyriCsGDYCE02Li1tXEYdNQPvLPHNE+rT2Mjei8N7fZbe0WLhw27j2SrGRpdMg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+
+    <script>
+      // 页面加载完成后执行
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const connectButton = document.getElementById("connectButton");
+        const statusDiv = document.getElementById("status");
+        const accountInfoDiv = document.getElementById("accountInfo");
+        const accountAddressSpan = document.getElementById("accountAddress");
+        const accountBalanceSpan = document.getElementById("accountBalance");
+
+        // 检查是否安装MetaMask
+        const hasMetamask =
+          typeof window !== "undefined" &&
+          typeof window.ethereum !== "undefined";
+
+        if (!hasMetamask) {
+          statusDiv.className = "error";
+          statusDiv.innerHTML =
+            '❌ 请安装 <a href="https://metamask.io/" target="_blank">MetaMask</a> 后再试';
+          return;
+        }
+
+        // 启用连接按钮
+        connectButton.disabled = false;
+        statusDiv.className = "success";
+        statusDiv.innerHTML = "✅ MetaMask 已安装，点击按钮连接";
+
+        // 连接MetaMask函数
+        async function connectMetamask() {
+          try {
+            statusDiv.className = "info";
+            statusDiv.innerHTML = "🔄 正在连接MetaMask...";
+            connectButton.disabled = true;
+
+            // 创建provider并请求账户
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const accounts = await provider.send("eth_requestAccounts", []);
+            console.log('accounts: ', accounts);
+
+            // 显示账户信息
+            const account = accounts[0];
+            accountAddressSpan.textContent = account;
+
+            // 获取余额
+            const balance = await provider.getBalance(account);
+            const balanceInEth = ethers.utils.formatEther(balance);
+            accountBalanceSpan.textContent = balanceInEth;
+
+            // 显示账户信息
+            accountInfoDiv.style.display = "block";
+
+            statusDiv.className = "success";
+            statusDiv.innerHTML = `✅ 连接成功！已连接账户: ${account.substring(
+              0,
+              6
+            )}...${account.substring(38)}`;
+
+            // 更新按钮文本
+            connectButton.textContent = "已连接";
+            connectButton.disabled = true;
+          } catch (error) {
+            console.error("连接错误:", error);
+
+            statusDiv.className = "error";
+            if (error.code === 4001) {
+              statusDiv.innerHTML = "❌ 用户拒绝了连接请求";
+            } else {
+              statusDiv.innerHTML = "❌ 连接失败: " + error.message;
+            }
+
+            connectButton.disabled = false;
+          }
+        }
+
+        // 绑定按钮点击事件
+        connectButton.addEventListener("click", connectMetamask);
+
+        // 监听账户变化
+        if (window.ethereum) {
+          window.ethereum.on("accountsChanged", function (accounts) {
+            if (accounts.length === 0) {
+              // 用户断开连接
+              statusDiv.className = "info";
+              statusDiv.innerHTML = "🔌 账户已断开连接";
+              accountInfoDiv.style.display = "none";
+              connectButton.textContent = "连接MetaMask";
+              connectButton.disabled = false;
+            } else {
+              // 账户切换，重新加载信息
+              connectMetamask();
+            }
+          });
+
+          // 监听链变化
+          window.ethereum.on("chainChanged", function (chainId) {
+            // 链变化时重新加载页面
+            window.location.reload();
+          });
+        }
+      });
+    </script>
+  </body>
+</html>
