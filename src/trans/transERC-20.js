@@ -13,7 +13,7 @@ import {
 // 调用合约的 transfer 方法发起转账交易；
 // 等待交易上链并确认，获取交易回执信息。
 
-const provider = new JsonRpcProvider(RPC_URL);
+const provider = new ethers.JsonRpcProvider(RPC_URL);
 const wallet = new Wallet(MY_PRIVATE_KEY, provider);
 
 // 声明ABI接口，用于调用代币合约的方法
